@@ -260,6 +260,8 @@ public class GenomeRenderer extends Renderable {
 
 		if (e.getClickCount() == 2) {
 			selectedNode = tempNode;
+		} else {
+			selectedNode = null;
 		}
 	}
 
