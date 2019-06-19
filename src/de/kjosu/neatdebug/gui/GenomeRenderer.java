@@ -242,9 +242,6 @@ public class GenomeRenderer extends Renderable {
 		g.setStroke(new BasicStroke(connectionWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 9 }, 0));
 
 		g.draw(curve);
-
-		g.setColor(Color.BLACK);
-		g.drawString(String.format("%.2f", c.getWeight()), (int) ctrlx, (int) ctrly - 10);
 	}
 
 	@Override
