@@ -8,8 +8,10 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.QuadCurve2D;
 import java.awt.geom.Rectangle2D;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Stack;
 import java.util.concurrent.ThreadLocalRandom;
 
 import de.kjosu.jnstinct.core.ConnectionGene;
@@ -22,7 +24,7 @@ public class GenomeRenderer extends Renderable {
 	private final ThreadLocalRandom random = ThreadLocalRandom.current();
 
 	// Variables
-	public int nodeRadius = 30;
+	public int nodeRadius = 15;
 	public int connectionWidth = 2;
 
 	public Color inputNodeColor = new Color(144, 238, 144);
@@ -87,6 +89,7 @@ public class GenomeRenderer extends Renderable {
 
 		if (selectedNode != null) {
 			selectedNode = genome.getNode(selectedNode.getId());
+			selectedConnection = genome.getSelf(selectedNode.getSelf());
 		}
 
 		if (selectedConnection != null) {
@@ -163,7 +166,7 @@ public class GenomeRenderer extends Renderable {
 
 		g.setFont(new Font("Consolas", Font.PLAIN, 12));
 
-		int x = settings.renderWidth - 200;
+		int x = settings.renderWidth - 400;
 		int y = settings.renderHeight - 125;
 
 		g.setColor(Color.BLACK);
@@ -209,21 +212,21 @@ public class GenomeRenderer extends Renderable {
 				break;
 		}
 
-		final int x = (int) (p.x - nodeRadius / 2);
-		final int y = (int) (p.y - nodeRadius / 2);
+		final int x = (int) (p.x - nodeRadius);
+		final int y = (int) (p.y - nodeRadius);
 
 		g.setStroke(new BasicStroke(1));
-		g.fillOval(x, y, nodeRadius, nodeRadius);
+		g.fillOval(x, y, nodeRadius * 2, nodeRadius * 2);
 
 		g.setColor(Color.BLACK);
-		g.drawOval(x, y, nodeRadius, nodeRadius);
+		g.drawOval(x, y, nodeRadius * 2, nodeRadius * 2);
 
 		g.setFont(new Font("Consolas", Font.BOLD, 25));
 
 		final String text = String.valueOf(node.getId());
 		final Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
 
-		bounds.setRect(x + nodeRadius / 2 - bounds.getWidth() / 2, y + nodeRadius / 2 + bounds.getHeight() / 4, bounds.getWidth(), bounds.getHeight());
+		bounds.setRect(x + nodeRadius - bounds.getWidth() / 2, y + nodeRadius + bounds.getHeight() / 4, bounds.getWidth(), bounds.getHeight());
 
 		g.setColor(Color.WHITE);
 		g.drawString(String.valueOf(node.getId()), (int) bounds.getX(), (int) bounds.getY());
@@ -262,10 +265,10 @@ public class GenomeRenderer extends Renderable {
 
 		g.setColor(c.isEnabled() ? connectionEnabledColor : connectionDisabledColor);
 		g.setStroke(new BasicStroke(connectionWidth));
-		g.drawOval((int) p.x, (int) p.y, nodeRadius, nodeRadius);
+		g.drawOval((int) p.x, (int) p.y, nodeRadius * 2, nodeRadius * 2);
 
 		g.setColor(Color.BLACK);
-		g.drawString(String.format("%.2f", c.getWeight()), (int) p.x + nodeRadius / 2, (int) p.y + nodeRadius);
+		g.drawString(String.format("%.2f", c.getWeight()), (int) p.x + nodeRadius, (int) p.y + nodeRadius * 2);
 	}
 
 	private void drawGateConnection(final Graphics2D g, final ConnectionGene c) {
@@ -311,7 +314,12 @@ public class GenomeRenderer extends Renderable {
 			selectedNode = tempNode;
 
 			if (tempNode == null) {
-				for (ConnectionGene c : genome.getConnections().values()) {
+			    List<ConnectionGene> allConnections = new Stack<>();
+			    allConnections.addAll(genome.getConnections().values());
+			    allConnections.addAll(genome.getGates().keySet());
+			    allConnections.addAll(genome.getSelfs().values());
+
+				for (ConnectionGene c : allConnections) {
 					Point p1 = nodeCoordinates.get(genome.getNode(c.getFromNode()));
 					Point p2 = nodeCoordinates.get(genome.getNode(c.getToNode()));
 
@@ -319,20 +327,15 @@ public class GenomeRenderer extends Renderable {
 						continue;
 					}
 
-					double dxc = e.getX() - p1.x;
-					double dyc = e.getY() - p1.y;
-
-					double dx1 = p2.x - p1.x;
-					double dy1 = p2.y - p1.y;
-
-					double distance = dxc * dy1 - dyc * dx1;
-
-					if (distance <= connectionWidth) {
-						selectedConnection = c;
-						break;
-					}
+					if (isBetweenLine(createScreenCoordinates(p1), createScreenCoordinates(p2),
+                            new Point(e.getX(), e.getY()), connectionWidth)) {
+                        selectedConnection = c;
+                        break;
+                    }
 				}
-			}
+			} else {
+			    selectedConnection = genome.getSelf(tempNode.getSelf());
+            }
 		} else if (tempNode == null) {
 			selectedNode = null;
 		}
@@ -370,4 +373,11 @@ public class GenomeRenderer extends Renderable {
 	public void setGenome(final Genome<?> genome) {
 		this.genome = genome;
 	}
+
+	private boolean isBetweenLine(Point a, Point b, Point c, double threshold) {
+	    double distance = Math.abs((b.x - a.x) * (a.y - c.y) - (a.x - c.x) * (b.y - a.y)) /
+                Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+
+        return Math.abs(distance) <= threshold;
+    }
 }
