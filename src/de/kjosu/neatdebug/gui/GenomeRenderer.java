@@ -34,6 +34,7 @@ public class GenomeRenderer extends Renderable {
 	// ----------------
 	private NodeGene selectedNode;
 	private NodeGene tempNode;
+	private ConnectionGene selectedConnection;
 	// ----------------
 
 	private Genome<?> genome;
@@ -83,6 +84,14 @@ public class GenomeRenderer extends Renderable {
 
 			nodeCoordinates.put(node, point);
 		}
+
+		if (selectedNode != null) {
+			selectedNode = genome.getNode(selectedNode.getId());
+		}
+
+		if (selectedConnection != null) {
+			selectedConnection = genome.getConnection(selectedConnection.getId());
+		}
 	}
 
 	@Override
@@ -110,6 +119,11 @@ public class GenomeRenderer extends Renderable {
 			drawNode(g, node);
 		}
 
+		drawNodeSelectionInfo(g);
+		drawConnectionSelectionInfo(g);
+	}
+
+	private void drawNodeSelectionInfo(Graphics2D g) {
 		if (selectedNode == null) {
 			return;
 		}
@@ -117,19 +131,53 @@ public class GenomeRenderer extends Renderable {
 		g.setFont(new Font("Consolas", Font.PLAIN, 12));
 
 		int x = settings.renderWidth - 200;
-		int y = settings.renderHeight - 120;
+		int y = settings.renderHeight - 125;
 
 		g.setColor(Color.BLACK);
-		g.fillRect(x, y, 200, 120);
+		g.fillRect(x, y, 200, 125);
 
 		final String[] data = new String[] {
-			String.format("Innovation: %s", selectedNode.getId()),
-			"",
-			String.format("Activation: %.2f", selectedNode.getActivation()),
-			String.format("NewState: %.2f", selectedNode.getState()),
-			String.format("OldState: %.2f", selectedNode.getOld()),
-			String.format("Bias: %.2f", selectedNode.getBias()),
-			String.format("Squash: %s", selectedNode.getSquash()),
+				String.format("Innovation: %s", selectedNode.getId()),
+				"",
+				String.format("Activation: %.2f", selectedNode.getActivation()),
+				String.format("NewState: %.2f", selectedNode.getState()),
+				String.format("OldState: %.2f", selectedNode.getOld()),
+				String.format("Bias: %.2f", selectedNode.getBias()),
+				String.format("Squash: %s", selectedNode.getSquash()),
+		};
+
+		x += 10;
+		y += 15;
+
+		g.setColor(Color.WHITE);
+		for (final String s : data) {
+			g.drawString(s, x, y);
+			y += 15;
+		}
+	}
+
+	private void drawConnectionSelectionInfo(Graphics2D g) {
+		if (selectedConnection == null) {
+			return;
+		}
+
+		g.setFont(new Font("Consolas", Font.PLAIN, 12));
+
+		int x = settings.renderWidth - 200;
+		int y = settings.renderHeight - 125;
+
+		g.setColor(Color.BLACK);
+		g.fillRect(x, y, 200, 125);
+
+		String[] data = new String[] {
+			String.format("Innovation: %s", selectedConnection.getId()),
+				"",
+				String.format("Input Node: %s", selectedConnection.getFromNode()),
+				String.format("Output Node: %s", selectedConnection.getToNode()),
+				String.format("Gater Node: %s", selectedConnection.getGaterNode()),
+				String.format("Weight: %.2f", selectedConnection.getWeight()),
+				String.format("Gain: %.2f", selectedConnection.getGain()),
+				String.format("Enabled: %s", selectedConnection.isEnabled())
 		};
 
 		x += 10;
@@ -247,6 +295,7 @@ public class GenomeRenderer extends Renderable {
 	@Override
 	public void mousePressed(final MouseEvent e) {
 		tempNode = null;
+		selectedConnection = null;
 
 		for (final Entry<NodeGene, Point> entry : nodeCoordinates.entrySet()) {
 			final NodeGene node = entry.getKey();
@@ -260,7 +309,31 @@ public class GenomeRenderer extends Renderable {
 
 		if (e.getClickCount() == 2) {
 			selectedNode = tempNode;
-		} else {
+
+			if (tempNode == null) {
+				for (ConnectionGene c : genome.getConnections().values()) {
+					Point p1 = nodeCoordinates.get(genome.getNode(c.getFromNode()));
+					Point p2 = nodeCoordinates.get(genome.getNode(c.getToNode()));
+
+					if (p1 == null || p2 == null) {
+						continue;
+					}
+
+					double dxc = e.getX() - p1.x;
+					double dyc = e.getY() - p1.y;
+
+					double dx1 = p2.x - p1.x;
+					double dy1 = p2.y - p1.y;
+
+					double distance = dxc * dy1 - dyc * dx1;
+
+					if (distance <= connectionWidth) {
+						selectedConnection = c;
+						break;
+					}
+				}
+			}
+		} else if (tempNode == null) {
 			selectedNode = null;
 		}
 	}
