@@ -1,14 +1,15 @@
-package de.kjosu.neatdebug;
+package de.kjosu.neatdebug.old;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
 
+import de.kjosu.jnstinct.core.Genome;
 import de.kjosu.jnstinct.core.Neat;
-import de.kjosu.neatdebug.gui.GenomeRenderer;
-import de.kjosu.neatdebug.gui.RenderEngine;
-import de.kjosu.neatdebug.gui.RenderSettings;
+import de.kjosu.neatdebug.old.GenomeRenderer;
+import de.kjosu.neatdebug.old.RenderEngine;
+import de.kjosu.neatdebug.old.RenderSettings;
 
 public class NeatDebugger extends JFrame {
 
@@ -37,6 +38,10 @@ public class NeatDebugger extends JFrame {
 		add(engine);
 
 		engine.start();
+	}
+
+	public void showGenome(Genome<?> g) {
+		genomeRenderer.setGenome(g);
 	}
 
 	public void showFittest() {

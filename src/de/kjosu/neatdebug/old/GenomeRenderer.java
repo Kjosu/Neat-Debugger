@@ -1,4 +1,4 @@
-package de.kjosu.neatdebug.gui;
+package de.kjosu.neatdebug.old;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -17,7 +17,6 @@ import java.util.concurrent.ThreadLocalRandom;
 import de.kjosu.jnstinct.core.ConnectionGene;
 import de.kjosu.jnstinct.core.Genome;
 import de.kjosu.jnstinct.core.NodeGene;
-import de.kjosu.neatdebug.util.Point;
 
 public class GenomeRenderer extends Renderable {
 

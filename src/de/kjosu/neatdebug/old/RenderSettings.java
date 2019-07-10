@@ -1,4 +1,4 @@
-package de.kjosu.neatdebug.gui;
+package de.kjosu.neatdebug.old;
 
 public class RenderSettings {
 

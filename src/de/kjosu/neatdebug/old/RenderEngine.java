@@ -1,4 +1,4 @@
-package de.kjosu.neatdebug.gui;
+package de.kjosu.neatdebug.old;
 
 import java.awt.Canvas;
 import java.awt.Color;

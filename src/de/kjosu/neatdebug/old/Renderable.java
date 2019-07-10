@@ -1,4 +1,4 @@
-package de.kjosu.neatdebug.gui;
+package de.kjosu.neatdebug.old;
 
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
