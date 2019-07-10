@@ -2,6 +2,8 @@
 
 Debugging Tool for JNSTINCT (https://github.com/Kjosu/JNSTINCT)
 
+<img src="./NeatDebugger.png" width="400" height="300">
+
 ## Features
 - Colorized Nodes and Enabled/Disabled/Gated connections
 - Dragable Nodes
