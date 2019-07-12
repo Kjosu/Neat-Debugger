@@ -5,15 +5,17 @@ Debugging Tool for JNSTINCT (https://github.com/Kjosu/JNSTINCT)
 <img src="./NeatDebugger.png" width="400" height="300">
 
 ## Features
+- Add empty genome to population
+- Remove genomes from population
+- Save/Load genomes
+- Select and crossover two genomes
+
+## COMING SOON
 - Colorized Nodes and Enabled/Disabled/Gated connections
 - Dragable Nodes
 - Node/Connection information inspector (Double-Click node/connection)
 
-## COMING SOON
 - Choose genome from population
-- Add empty genome to population
-- Remove genome from population
-- Save/Load genomes
 - Interactable node/connection inspectors
 - Manually change weights/values of nodes/connections
 - Mutate per button click
@@ -27,13 +29,5 @@ Debugging Tool for JNSTINCT (https://github.com/Kjosu/JNSTINCT)
 
 ## Usage
 ```java
-Neat<?> neat = ...
-
-NeatDebugger debugger = new NeatDebugger(neat);
-debugger.setVisible(true);
-
-while (training) {
-  neat.evolve();
-  debugger.showFittest();
-}
+WIP
 ```
