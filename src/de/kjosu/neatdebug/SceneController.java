@@ -83,14 +83,18 @@ public class SceneController<T extends Genome<T>> {
         populationSaveButton.setText(FontAwesome.Save);
     }
 
-    private void initializeNeat() {
+    public void updatePopulationList() {
+        String headerText;
+
         if (neat == null) {
             populationListView.getItems().clear();
-            populationHeader.setText("Population");
+            headerText = "Population";
         } else {
-            populationHeader.setText(String.format("Population (%s/%s)", neat.getPopulation().size(), neat.getPopulationSize()));
             populationListView.getItems().setAll(neat.getPopulation());
+            headerText = String.format("Population (%s/%s)", populationListView.getItems().size(), neat.getPopulationSize());
         }
+
+        populationHeader.setText(headerText);
     }
 
     @FXML
@@ -99,12 +103,14 @@ public class SceneController<T extends Genome<T>> {
             return;
         }
 
-        if (neat.getPopulation().size() < neat.getPopulationSize()) {
-            T genome = neat.createGenome(neat, neat.getInputSize(), neat.getOutputSize(), true);
-            neat.getPopulation().add(genome);
-
-            initializeNeat();
+        if (neat.getPopulation().size() >= neat.getPopulationSize()) {
+            return;
         }
+
+        T genome = neat.createGenome(neat, neat.getInputSize(), neat.getOutputSize(), true);
+        neat.getPopulation().add(genome);
+
+        updatePopulationList();
     }
 
     @FXML
@@ -123,7 +129,7 @@ public class SceneController<T extends Genome<T>> {
             neat.getPopulation().remove(genome);
         }
 
-        initializeNeat();
+        updatePopulationList();
     }
 
     @FXML
@@ -141,7 +147,7 @@ public class SceneController<T extends Genome<T>> {
         T genome = neat.createGenome(neat, selected.get(0), selected.get(1), false);
         neat.getPopulation().add(genome);
 
-        initializeNeat();
+        updatePopulationList();
 
         populationListView.getSelectionModel().select(genome);
     }
@@ -171,7 +177,7 @@ public class SceneController<T extends Genome<T>> {
             }
 
             neat.getPopulation().add(genome);
-            initializeNeat();
+            updatePopulationList();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -210,6 +216,6 @@ public class SceneController<T extends Genome<T>> {
     public void setNeat(Neat<T> neat) {
         this.neat = neat;
 
-        initializeNeat();
+        updatePopulationList();
     }
 }

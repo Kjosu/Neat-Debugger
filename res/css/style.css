@@ -46,12 +46,12 @@
     -fx-background-radius: 0;
 }
 
-.list-cell {
+.list-view .list-cell {
     -fx-background-color: transparent;
     -fx-text-fill: white;
 }
 
-.list-cell:selected {
+.list-view .list-cell:selected {
     -fx-background-color: #6699CC;
 }
 
@@ -79,6 +79,19 @@
     -fx-background-color: #454545;
 }
 
+.label {
+    -fx-text-fill: white;
+}
+
+.text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: #454545;
+}
+
 .font-awesome {
     -fx-font-family: "Font Awesome 5 Free";
+}
+
+.dark-border {
+    -fx-border-color: #454545;
 }
