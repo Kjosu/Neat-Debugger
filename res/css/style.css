@@ -1,0 +1,84 @@
+.window {
+    -fx-background-color: #555555;
+}
+
+.background-pane {
+
+}
+
+.content-pane {
+    -fx-background-color: #555555;
+    -fx-border-width: 1px;
+    -fx-border-color: #454545 #666666 #454545 #666666;
+}
+
+.content-title {
+    -fx-border-width: 1px;
+    -fx-border-color: transparent transparent #454545 transparent;
+
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 0 5px;
+}
+
+.list-view {
+    -fx-background-color: #555555;
+    -fx-border-width: 0 0 1px 0;
+    -fx-border-color: #454545;
+}
+
+.list-view .scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.list-view .scroll-bar:vertical .thumb {
+    -fx-background-color: #808080;
+    -fx-background-radius: 0;
+}
+
+.list-view .increment-button,
+.list-view .decrement-button {
+    -fx-background-color: transparent;
+}
+
+.list-view:focused {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.list-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.list-cell:selected {
+    -fx-background-color: #6699CC;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.button {
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+}
+
+.button:hover {
+    -fx-background-color: #505050;
+}
+
+.button:pressed {
+    -fx-background-color: #454545;
+}
+
+.font-awesome {
+    -fx-font-family: "Font Awesome 5 Free";
+}
