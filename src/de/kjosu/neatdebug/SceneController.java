@@ -2,7 +2,12 @@ package de.kjosu.neatdebug;
 
 import de.kjosu.jnstinct.core.Genome;
 import de.kjosu.jnstinct.core.Neat;
+import de.kjosu.jnstinct.core.NodeGene;
 import de.kjosu.jnstinct.util.GenomeLoader;
+import de.kjosu.jnstinct.util.MapUtils;
+import de.kjosu.neatdebug.components.ConnectionInspector;
+import de.kjosu.neatdebug.components.GenomeVisualizer;
+import de.kjosu.neatdebug.components.NodeInspector;
 import de.kjosu.neatdebug.util.FontAwesome;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -10,6 +15,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -44,13 +50,22 @@ public class SceneController<T extends Genome<T>> {
     private Label visualizerHeader;
 
     @FXML
+    private GenomeVisualizer genomeVisualizer;
+
+    @FXML
     private Label mutationsHeader;
 
     @FXML
     private Label nodeInspectorHeader;
 
     @FXML
+    private NodeInspector nodeInspector;
+
+    @FXML
     private Label connectionInspectorHeader;
+
+    @FXML
+    private ConnectionInspector connectionInspector;
 
     private Stage stage;
 
@@ -81,6 +96,14 @@ public class SceneController<T extends Genome<T>> {
         crossoverButton.setText(FontAwesome.Dna);
         populationLoadButton.setText(FontAwesome.File);
         populationSaveButton.setText(FontAwesome.Save);
+
+        genomeVisualizer.setNodeInspector(nodeInspector);
+        genomeVisualizer.setConnectionInspector(connectionInspector);
+
+        nodeInspector.setConnectionInspector(connectionInspector);
+        connectionInspector.setNodeInspector(nodeInspector);
+
+        genomeVisualizer.start();
     }
 
     public void updatePopulationList() {
@@ -95,6 +118,16 @@ public class SceneController<T extends Genome<T>> {
         }
 
         populationHeader.setText(headerText);
+    }
+
+    @FXML
+    private void onPopulationListPressed(MouseEvent e) {
+        if (e.getClickCount() != 2) {
+            return;
+        }
+
+        Genome<?> genome = populationListView.getSelectionModel().getSelectedItem();
+        genomeVisualizer.setGenome(genome);
     }
 
     @FXML
@@ -217,5 +250,9 @@ public class SceneController<T extends Genome<T>> {
         this.neat = neat;
 
         updatePopulationList();
+    }
+
+    public void dispose() {
+        genomeVisualizer.stop();
     }
 }
