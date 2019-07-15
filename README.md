@@ -9,15 +9,14 @@ Debugging Tool for JNSTINCT (https://github.com/Kjosu/JNSTINCT)
 - Remove genomes from population
 - Save/Load genomes
 - Select and crossover two genomes
-
-## COMING SOON
 - Colorized Nodes and Enabled/Disabled/Gated connections
-- Dragable Nodes
-- Node/Connection information inspector (Double-Click node/connection)
-
 - Choose genome from population
 - Interactable node/connection inspectors
 - Manually change weights/values of nodes/connections
+
+## COMING SOON
+- Dragable Nodes
+- Node/Connection information inspector (Double-Click node/connection)
 - Mutate per button click
 - Single/Multi-step evolving per button click
 
