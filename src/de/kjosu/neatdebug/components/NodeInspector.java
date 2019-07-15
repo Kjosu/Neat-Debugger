@@ -3,17 +3,13 @@ package de.kjosu.neatdebug.components;
 import de.kjosu.jnstinct.activation.Squash;
 import de.kjosu.jnstinct.core.ConnectionGene;
 import de.kjosu.jnstinct.core.Genome;
-import de.kjosu.jnstinct.core.Neat;
 import de.kjosu.jnstinct.core.NodeGene;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 
-public class NodeInspector extends AnchorPane {
-
-    private GridPane contentPane = new GridPane();
+public class NodeInspector extends GridPane {
 
     private Label idLabel = new Label("Identifier");
     private TextField idField = new TextField();
@@ -25,16 +21,16 @@ public class NodeInspector extends AnchorPane {
     private ComboBox<Squash> squashBox = new ComboBox<>();
 
     private Label biasLabel = new Label("Bias");
-    private TextField biasField = new TextField();
+    private NumericTextField biasField = new NumericTextField();
 
     private Label activationLabel = new Label("Activation");
-    private TextField activationField = new TextField();
+    private NumericTextField activationField = new NumericTextField();
 
     private Label stateLabel = new Label("State");
-    private TextField stateField = new TextField();
+    private NumericTextField stateField = new NumericTextField();
 
     private Label oldStateLabel = new Label("Old state");
-    private TextField oldStateField = new TextField();
+    private NumericTextField oldStateField = new NumericTextField();
 
     private Label incomingLabel = new Label("Incoming connections");
     private ListView<ConnectionGene> incomingList = new ListView<>();
@@ -43,7 +39,7 @@ public class NodeInspector extends AnchorPane {
     private ListView<ConnectionGene> outgoingList = new ListView<>();
 
     private Label selfLabel = new Label("Self connection");
-    private Button selfButton = new Button("Inspect");
+    private Hyperlink selfLink = new Hyperlink();
 
     private ConnectionInspector connectionInspector;
 
@@ -61,7 +57,11 @@ public class NodeInspector extends AnchorPane {
     }
 
     private void initComponents() {
-        contentPane.getStyleClass().add("content-pane");
+        getStyleClass().add("node-inspector");
+
+        setPadding(new Insets(5, 5, 5, 5));
+        setHgap(5D);
+        setVgap(5D);
 
         idLabel.getStyleClass().add("id-label");
         idField.getStyleClass().add("id-field");
@@ -93,6 +93,7 @@ public class NodeInspector extends AnchorPane {
 
         incomingLabel.getStyleClass().add("incoming-connections-label");
         incomingList.getStyleClass().add("incoming-connections-list");
+        incomingList.setMaxHeight(100D);
         incomingList.setOnMousePressed(event -> {
             if (event.getClickCount() == 2) {
                 incomingConnectionAction();
@@ -101,6 +102,7 @@ public class NodeInspector extends AnchorPane {
 
         outgoingLabel.getStyleClass().add("outgoing-connections-label");
         outgoingList.getStyleClass().add("outgoing-connections-list");
+        outgoingList.setMaxHeight(100D);
         outgoingList.setOnMousePressed(event -> {
             if (event.getClickCount() == 2) {
                 outgoingConnectionAction();
@@ -108,48 +110,74 @@ public class NodeInspector extends AnchorPane {
         });
 
         selfLabel.getStyleClass().add("self-connection-label");
-        selfButton.getStyleClass().add("self-connection-button");
-        selfButton.setOnAction(event -> selfConnectionAction());
+        selfLink.getStyleClass().add("self-connection-link");
+        selfLink.setOnAction(event -> selfConnectionAction());
 
-        contentPane.add(idLabel, 0, 0);
-        contentPane.add(idField, 1, 0);
-        contentPane.add(typeLabel, 0, 1);
-        contentPane.add(typeField, 1, 1);
-        contentPane.add(squashLabel, 0, 2);
-        contentPane.add(squashBox, 1, 2);
-        contentPane.add(biasLabel, 0, 3);
-        contentPane.add(biasField, 1, 3);
-        contentPane.add(activationLabel, 0, 4);
-        contentPane.add(activationField, 1, 4);
-        contentPane.add(stateLabel, 0, 5);
-        contentPane.add(stateField, 1, 5);
-        contentPane.add(oldStateLabel, 0, 6);
-        contentPane.add(oldStateField, 1, 6);
-        contentPane.add(incomingLabel, 0, 7, 2, 0);
-        contentPane.add(incomingList, 0, 8, 2, 0);
-        contentPane.add(outgoingLabel, 0, 9, 2, 0);
-        contentPane.add(outgoingList, 0, 10, 2, 0);
-        contentPane.add(selfLabel, 0, 11, 2, 0);
-        contentPane.add(selfButton, 0, 12, 2, 0);
+        add(idLabel, 0, 0);
+        add(idField, 1, 0);
+        add(typeLabel, 0, 1);
+        add(typeField, 1, 1);
+        add(squashLabel, 0, 2);
+        add(new AnchorPane(squashBox), 1, 2);
+        add(biasLabel, 0, 3);
+        add(biasField, 1, 3);
+        add(activationLabel, 0, 4);
+        add(activationField, 1, 4);
+        add(stateLabel, 0, 5);
+        add(stateField, 1, 5);
+        add(oldStateLabel, 0, 6);
+        add(oldStateField, 1, 6);
+        add(new AnchorPane(incomingLabel), 0, 7, 2, 1);
+        add(incomingList, 0, 8, 2, 1);
+        add(new AnchorPane(outgoingLabel), 0, 9, 2, 1);
+        add(outgoingList, 0, 10, 2, 1);
+        add(selfLabel, 0, 11, 2, 1);
+        add(selfLink, 0, 12, 2, 1);
 
-        getChildren().add(contentPane);
-    }
+        AnchorPane.setLeftAnchor(squashBox, 0D);
+        AnchorPane.setBottomAnchor(squashBox, 0D);
+        AnchorPane.setRightAnchor(squashBox, 0D);
+        AnchorPane.setTopAnchor(squashBox, 0D);
 
-    public void setConnectionInspector(ConnectionInspector connectionInspector) {
-        this.connectionInspector = connectionInspector;
-    }
+        AnchorPane.setLeftAnchor(incomingLabel, 0D);
+        AnchorPane.setBottomAnchor(incomingLabel, 0D);
+        AnchorPane.setRightAnchor(incomingLabel, 0D);
+        AnchorPane.setTopAnchor(incomingLabel, 0D);
 
-    public ConnectionInspector getConnectionInspector() {
-        return connectionInspector;
+        AnchorPane.setLeftAnchor(outgoingLabel, 0D);
+        AnchorPane.setBottomAnchor(outgoingLabel, 0D);
+        AnchorPane.setRightAnchor(outgoingLabel, 0D);
+        AnchorPane.setTopAnchor(outgoingLabel, 0D);
+
+        set(null, null);
     }
 
     public void set(Genome<?> genome, NodeGene node) {
+        this.genome = genome;
         this.node = node;
+
+        update();
+    }
+
+    public void update() {
+        boolean disable = node == null;
 
         incomingList.getItems().clear();
         outgoingList.getItems().clear();
 
-        if (node == null) {
+        idField.setDisable(disable);
+        typeField.setDisable(disable);
+        squashBox.setDisable(disable);
+        biasField.setDisable(disable);
+        activationField.setDisable(disable);
+        stateField.setDisable(disable);
+        oldStateField.setDisable(disable);
+        incomingList.setDisable(disable);
+        outgoingList.setDisable(disable);
+        selfLink.setDisable(true);
+        selfLink.setText("undefined");
+
+        if (disable) {
             idField.clear();
             typeField.clear();
             squashBox.getItems().clear();
@@ -158,7 +186,6 @@ public class NodeInspector extends AnchorPane {
             activationField.clear();
             stateField.clear();
             oldStateField.clear();
-            selfButton.setDisable(true);
         } else {
             idField.setText(String.valueOf(node.getId()));
             typeField.setText(node.getType().name());
@@ -169,20 +196,21 @@ public class NodeInspector extends AnchorPane {
             stateField.setText(String.valueOf(node.getState()));
             oldStateField.setText(String.valueOf(node.getOld()));
 
-            for (int id : node.getIncoming()) {
-                incomingList.getItems().add(genome.getConnection(id));
-            }
+            if (genome != null) {
+                for (int id : node.getIncoming()) {
+                    incomingList.getItems().add(genome.getConnection(id));
+                }
 
-            for (int id : node.getOutgoing()) {
-                outgoingList.getItems().add(genome.getConnection(id));
-            }
+                for (int id : node.getOutgoing()) {
+                    outgoingList.getItems().add(genome.getConnection(id));
+                }
 
-            selfButton.setDisable(false);
+                if (node.getSelf() != -1) {
+                    selfLink.setDisable(false);
+                    selfLink.setText(String.format("Connection %s", node.getSelf()));
+                }
+            }
         }
-    }
-
-    public NodeGene getNode() {
-        return node;
     }
 
     private void squashAction() {
@@ -190,30 +218,59 @@ public class NodeInspector extends AnchorPane {
     }
 
     private void biasAction() {
-        // TODO change to numeric text fields
+        node.setBias(biasField.getValue());
     }
 
     private void activationAction() {
-
+        node.setActivation(activationField.getValue());
     }
 
     private void stateAction() {
-
+        node.setState(stateField.getValue());
     }
 
     private void oldStateAction() {
-
+        node.setOld(oldStateField.getValue());
     }
 
     private void incomingConnectionAction() {
+        ConnectionGene connection = incomingList.getSelectionModel().getSelectedItem();
 
+        if (connection == null || connectionInspector == null) {
+            return;
+        }
+
+        connectionInspector.set(genome, connection);
     }
 
     private void outgoingConnectionAction() {
+        ConnectionGene connection = outgoingList.getSelectionModel().getSelectedItem();
 
+        if (connection == null || connectionInspector == null) {
+            return;
+        }
+
+        connectionInspector.set(genome, connection);
     }
 
     private void selfConnectionAction() {
+        if (node == null || node.getSelf() == -1 || connectionInspector == null) {
+            return;
+        }
 
+        ConnectionGene connection = genome.getSelf(node.getSelf());
+        connectionInspector.set(genome, connection);
+    }
+
+    public void setConnectionInspector(ConnectionInspector connectionInspector) {
+        this.connectionInspector = connectionInspector;
+    }
+
+    public ConnectionInspector getConnectionInspector() {
+        return connectionInspector;
+    }
+
+    public NodeGene getNode() {
+        return node;
     }
 }
