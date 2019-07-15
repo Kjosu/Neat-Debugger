@@ -2,7 +2,7 @@
 
 Debugging Tool for JNSTINCT (https://github.com/Kjosu/JNSTINCT)
 
-<img src="./WIP.png" width="400" height="300">
+<img src="./WIP.png" width="600" height="450">
 
 ## Features
 - Add empty genome to population
