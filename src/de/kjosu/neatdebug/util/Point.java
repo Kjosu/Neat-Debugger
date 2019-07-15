@@ -1,4 +1,4 @@
-package de.kjosu.neatdebug.old;
+package de.kjosu.neatdebug.util;
 
 public class Point {
 
