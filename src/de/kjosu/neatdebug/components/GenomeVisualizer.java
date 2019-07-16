@@ -51,28 +51,7 @@ public class GenomeVisualizer extends RenderCanvas {
         }
 
         for (NodeGene node : genome.getNodes().values()) {
-            if (coordinates.containsKey(node)) {
-                continue;
-            }
-
-            Point p = new Point();
-
-            switch (node.getType()) {
-                case Input:
-                    p.x = .1;
-                    p.y = (node.getId() + 1D) / (genome.getInputSize() + 1D);
-                    break;
-                case Output:
-                    p.x = .9;
-                    p.y = (node.getId() - genome.getInputSize() + 1D) / (genome.getOutputSize() + 1D);
-                    break;
-                default:
-                    p.x = random.nextDouble(0.15, 0.85);
-                    p.y = random.nextDouble(0.1, 0.9);
-                    break;
-            }
-
-            coordinates.put(node, p);
+            getCoordinates(node);
 
             if (nodeInspector != null && nodeInspector.getNode() != null &&
                     nodeInspector.getNode().getId() == node.getId()) {
@@ -108,9 +87,21 @@ public class GenomeVisualizer extends RenderCanvas {
             return;
         }
 
-        renderGates(g);
-        renderConnections(g);
-        renderNodes(g);
+        for (NodeGene node : genome.getNodes().values()) {
+            renderSelfConnection(g, genome.getSelf(node.getSelf()));
+        }
+
+        for (ConnectionGene c : genome.getConnections().values()) {
+            renderGate(g, c);
+        }
+
+        for (ConnectionGene c : genome.getConnections().values()) {
+            renderConnection(g, c);
+        }
+
+        for (NodeGene node : genome.getNodes().values()) {
+            renderNode(g, node);
+        }
     }
 
     @Override
@@ -164,89 +155,127 @@ public class GenomeVisualizer extends RenderCanvas {
 
     }
 
-    private void renderNodes(GraphicsContext g) {
+    private void renderNode(GraphicsContext g, NodeGene node) {
         int nodeDiameter = nodeRadius * 2;
 
         g.setFont(new Font("Consolas", 15));
         g.setTextAlign(TextAlignment.CENTER);
         g.setTextBaseline(VPos.CENTER);
 
-        for (Map.Entry<NodeGene, Point> entry : coordinates.entrySet()) {
-            NodeGene node = entry.getKey();
-            Point point = getScreenCoordinates(entry.getValue());
+        Point point = getCoordinates(node);
 
-            switch (node.getType()) {
-                case Input:
-                    g.setFill(Color.DEEPSKYBLUE);
-                    break;
-                case Output:
-                    g.setFill(Color.ORANGE);
-                    break;
-                default:
-                    g.setFill(Color.LIGHTGRAY);
-                    break;
-            }
-
-            g.fillOval(point.x - nodeRadius, point.y - nodeRadius, nodeDiameter, nodeDiameter);
-
-            g.setFill(Color.WHITE);
-            g.fillText(String.valueOf(node.getId()), point.x, point.y);
+        switch (node.getType()) {
+            case Input:
+                g.setFill(Color.DEEPSKYBLUE);
+                break;
+            case Output:
+                g.setFill(Color.ORANGE);
+                break;
+            default:
+                g.setFill(Color.LIGHTGRAY);
+                break;
         }
+
+        g.fillOval(point.x - nodeRadius, point.y - nodeRadius, nodeDiameter, nodeDiameter);
+
+        g.setFill(Color.WHITE);
+        g.fillText(String.valueOf(node.getId()), point.x, point.y);
     }
 
-    private void renderConnections(GraphicsContext g) {
+    private void renderSelfConnection(final GraphicsContext g, final ConnectionGene c) {
+        if (c == null || c.getFromNode() != c.getToNode()) {
+            return;
+        }
+
+        Point node = coordinates.get(genome.getNode(c.getFromNode()));
+
+        if (node == null) {
+            return;
+        }
+
+        Point p = getScreenCoordinates(node);
+        int nodeDiameter = nodeRadius * 2;
+
+        g.setStroke(c.isEnabled() ? Color.GREEN : Color.RED);
+        g.setLineWidth(connectionWidth);
+        g.strokeOval(p.x, p.y, nodeDiameter, nodeDiameter);
+    }
+
+    private void renderConnection(GraphicsContext g, ConnectionGene c) {
         g.setLineWidth(connectionWidth);
         g.setLineDashes(null);
 
-        for (ConnectionGene c : genome.getConnections().values()) {
-            Point inNode = coordinates.get(genome.getNode(c.getFromNode()));
-            Point outNode = coordinates.get(genome.getNode(c.getToNode()));
+        Point p1 = getCoordinates(genome.getNode(c.getFromNode()));
+        Point p2 = getCoordinates(genome.getNode(c.getToNode()));
 
-            if (inNode == null || outNode == null) {
-                continue;
-            }
-
-            Point p1 = getScreenCoordinates(inNode);
-            Point p2 = getScreenCoordinates(outNode);
-
-            g.setStroke((c.isEnabled()) ? Color.GREEN : Color.RED);
-
-            g.strokeLine(p1.x, p1.y, p2.x, p2.y);
+        if (p1 == null || p2 == null) {
+            return;
         }
+
+        g.setStroke((c.isEnabled()) ? Color.GREEN : Color.RED);
+
+        g.strokeLine(p1.x, p1.y, p2.x, p2.y);
     }
 
-    private void renderGates(GraphicsContext g) {
+    private void renderGate(GraphicsContext g, ConnectionGene c) {
         g.setLineWidth(connectionWidth);
         g.setLineDashes(9, 8 ,7);
 
-        for (ConnectionGene c : genome.getConnections().values()) {
-            Point inNode = coordinates.get(genome.getNode(c.getFromNode()));
-            Point outNode = coordinates.get(genome.getNode(c.getToNode()));
-            Point gater = coordinates.get(genome.getNode(c.getGaterNode()));
+        Point p1 = getCoordinates(genome.getNode(c.getFromNode()));
+        Point p2 = getCoordinates(genome.getNode(c.getToNode()));
+        Point g1 = getCoordinates(genome.getNode(c.getGaterNode()));
 
-            if (inNode == null || outNode == null || gater == null) {
-                continue;
-            }
-
-            Point p1 = getScreenCoordinates(inNode);
-            Point p2 = getScreenCoordinates(outNode);
-            Point g1 = getScreenCoordinates(gater);
-
-            double mx = (p1.x + p2.x) / 2;
-            double my = (p1.y + p2.y) / 2;
-
-            double ctrlx = (g1.x + mx) / 2;
-            double ctrly = (g1.y + my) / 2 - 20;
-
-            final QuadCurve2D curve = new QuadCurve2D.Double();
-            curve.setCurve(gater.x, gater.y, ctrlx, ctrly, mx, my);
-
-            g.setStroke(c.isEnabled() ? Color.GREEN : Color.RED);
-            g.beginPath();
-            g.moveTo(g1.x, g1.y);
-            g.bezierCurveTo(ctrlx, ctrly, mx, my, mx, my);
-            g.stroke();
+        if (p1 == null || p2 == null || g1 == null) {
+            return;
         }
+
+        double mx = (p1.x + p2.x) / 2;
+        double my = (p1.y + p2.y) / 2;
+
+        double ctrlx = (g1.x + mx) / 2;
+        double ctrly = (g1.y + my) / 2 - 20;
+
+        final QuadCurve2D curve = new QuadCurve2D.Double();
+        curve.setCurve(g1.x, g1.y, ctrlx, ctrly, mx, my);
+
+        g.setStroke(c.isEnabled() ? Color.GREEN : Color.RED);
+        g.beginPath();
+        g.moveTo(g1.x, g1.y);
+        g.bezierCurveTo(ctrlx, ctrly, mx, my, mx, my);
+        g.stroke();
+    }
+
+    private Point getCoordinates(NodeGene node) {
+        if (node == null) {
+            return null;
+        }
+
+        Point p = coordinates.get(node);
+
+        if (p != null) {
+            return getScreenCoordinates(p);
+        }
+
+        p = new Point();
+
+        switch (node.getType()) {
+            case Input:
+                p.x = .1;
+                p.y = (node.getId() + 1D) / (genome.getInputSize() + 1D);
+                break;
+            case Output:
+                p.x = .9;
+                p.y = (node.getId() - genome.getInputSize() + 1D) / (genome.getOutputSize() + 1D);
+                break;
+            default:
+                p.x = random.nextDouble(0.15, 0.85);
+                p.y = random.nextDouble(0.1, 0.9);
+                break;
+        }
+
+        coordinates.put(node, p);
+
+        return getScreenCoordinates(p);
     }
 
     private Point getScreenCoordinates(Point p) {

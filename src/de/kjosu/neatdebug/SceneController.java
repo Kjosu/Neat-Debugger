@@ -9,6 +9,7 @@ import de.kjosu.neatdebug.components.ConnectionInspector;
 import de.kjosu.neatdebug.components.GenomeVisualizer;
 import de.kjosu.neatdebug.components.NodeInspector;
 import de.kjosu.neatdebug.util.FontAwesome;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -103,7 +104,7 @@ public class SceneController<T extends Genome<T>> {
         nodeInspector.setConnectionInspector(connectionInspector);
         connectionInspector.setNodeInspector(nodeInspector);
 
-        genomeVisualizer.start();
+        Platform.runLater(() -> genomeVisualizer.start());
     }
 
     public void updatePopulationList() {

@@ -191,7 +191,7 @@ public class NodeInspector extends GridPane {
             } else {
                 idField.setText(String.valueOf(node.getId()));
                 typeField.setText(node.getType().name());
-                squashBox.getItems().addAll(Squash.values());
+                squashBox.getItems().setAll(Squash.values());
                 squashBox.getSelectionModel().select(node.getSquash());
                 biasField.setText(String.valueOf(node.getBias()));
                 activationField.setText(String.valueOf(node.getActivation()));
