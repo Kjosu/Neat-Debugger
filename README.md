@@ -28,5 +28,24 @@ Debugging tool for JNSTINCT (https://github.com/Kjosu/JNSTINCT)
 
 ## Usage
 ```java
-WIP
+class UsageExample extends Application {
+  
+  private NeatDebugger debugger;
+  
+  @Override
+  public void start(Stage stage) throw Exception {
+    Neat<T> neat = ...;
+    
+    debugger = new NeatDebugger(stage);
+    debugger.setNeat(neat);
+    
+    stage.show();
+  }
+  
+  @Override
+  public void stop() {
+    debugger.getController().dispose();
+  }
+}
+
 ```
