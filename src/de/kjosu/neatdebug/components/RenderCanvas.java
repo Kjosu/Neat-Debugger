@@ -3,20 +3,32 @@ package de.kjosu.neatdebug.components;
 
 import javafx.application.Platform;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 
 import java.time.Duration;
 import java.time.Instant;
 
 public abstract class RenderCanvas extends ResizableCanvas implements Runnable {
 
-    private int maxTicksPerSecond = 20;
-    private int maxFramesPerSecond = 60;
+    private int maxTicksPerSecond = 10;
+    private int maxFramesPerSecond = 30;
 
     private int ticksPerSecond = 0;
     private int framesPerSecond = 0;
 
     private Thread thread;
     private boolean running;
+
+    public RenderCanvas() {
+        setOnMousePressed(event -> onMouseDown(event));
+        setOnMouseReleased(event -> onMouseUp(event));
+        setOnMouseMoved(event -> onMouseMoved(event));
+        setOnMouseDragged(event -> onMouseDragged(event));
+
+        setOnKeyPressed(event -> onKeyDown(event));
+        setOnKeyReleased(event -> onKeyUp(event));
+    }
 
     @Override
     public void run() {
@@ -64,6 +76,14 @@ public abstract class RenderCanvas extends ResizableCanvas implements Runnable {
     public abstract void onUpdate(double delta);
 
     public abstract void onRender(GraphicsContext g);
+
+    protected abstract void onMouseDown(MouseEvent e);
+    protected abstract void onMouseUp(MouseEvent e);
+    protected abstract void onMouseMoved(MouseEvent e);
+    protected abstract void onMouseDragged(MouseEvent e);
+
+    protected abstract void onKeyDown(KeyEvent e);
+    protected abstract void onKeyUp(KeyEvent e);
 
     public void start() {
         if (running) {

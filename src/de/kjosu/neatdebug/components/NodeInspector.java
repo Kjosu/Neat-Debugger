@@ -4,6 +4,7 @@ import de.kjosu.jnstinct.activation.Squash;
 import de.kjosu.jnstinct.core.ConnectionGene;
 import de.kjosu.jnstinct.core.Genome;
 import de.kjosu.jnstinct.core.NodeGene;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -160,57 +161,59 @@ public class NodeInspector extends GridPane {
     }
 
     public void update() {
-        boolean disable = node == null;
+        Platform.runLater(() -> {
+            boolean disable = node == null;
 
-        incomingList.getItems().clear();
-        outgoingList.getItems().clear();
+            incomingList.getItems().clear();
+            outgoingList.getItems().clear();
 
-        idField.setDisable(disable);
-        typeField.setDisable(disable);
-        squashBox.setDisable(disable);
-        biasField.setDisable(disable);
-        activationField.setDisable(disable);
-        stateField.setDisable(disable);
-        oldStateField.setDisable(disable);
-        incomingList.setDisable(disable);
-        outgoingList.setDisable(disable);
-        selfLink.setDisable(true);
-        selfLink.setText("undefined");
+            idField.setDisable(disable);
+            typeField.setDisable(disable);
+            squashBox.setDisable(disable);
+            biasField.setDisable(disable);
+            activationField.setDisable(disable);
+            stateField.setDisable(disable);
+            oldStateField.setDisable(disable);
+            incomingList.setDisable(disable);
+            outgoingList.setDisable(disable);
+            selfLink.setDisable(true);
+            selfLink.setText("undefined");
 
-        if (disable) {
-            idField.clear();
-            typeField.clear();
-            squashBox.getItems().clear();
-            squashBox.getSelectionModel().clearSelection();
-            biasField.clear();
-            activationField.clear();
-            stateField.clear();
-            oldStateField.clear();
-        } else {
-            idField.setText(String.valueOf(node.getId()));
-            typeField.setText(node.getType().name());
-            squashBox.getItems().addAll(Squash.values());
-            squashBox.getSelectionModel().select(node.getSquash());
-            biasField.setText(String.valueOf(node.getBias()));
-            activationField.setText(String.valueOf(node.getActivation()));
-            stateField.setText(String.valueOf(node.getState()));
-            oldStateField.setText(String.valueOf(node.getOld()));
+            if (disable) {
+                idField.clear();
+                typeField.clear();
+                squashBox.getItems().clear();
+                squashBox.getSelectionModel().clearSelection();
+                biasField.clear();
+                activationField.clear();
+                stateField.clear();
+                oldStateField.clear();
+            } else {
+                idField.setText(String.valueOf(node.getId()));
+                typeField.setText(node.getType().name());
+                squashBox.getItems().addAll(Squash.values());
+                squashBox.getSelectionModel().select(node.getSquash());
+                biasField.setText(String.valueOf(node.getBias()));
+                activationField.setText(String.valueOf(node.getActivation()));
+                stateField.setText(String.valueOf(node.getState()));
+                oldStateField.setText(String.valueOf(node.getOld()));
 
-            if (genome != null) {
-                for (int id : node.getIncoming()) {
-                    incomingList.getItems().add(genome.getConnection(id));
-                }
+                if (genome != null) {
+                    for (int id : node.getIncoming()) {
+                        incomingList.getItems().add(genome.getConnection(id));
+                    }
 
-                for (int id : node.getOutgoing()) {
-                    outgoingList.getItems().add(genome.getConnection(id));
-                }
+                    for (int id : node.getOutgoing()) {
+                        outgoingList.getItems().add(genome.getConnection(id));
+                    }
 
-                if (node.getSelf() != -1) {
-                    selfLink.setDisable(false);
-                    selfLink.setText(String.format("Connection %s", node.getSelf()));
+                    if (node.getSelf() != -1) {
+                        selfLink.setDisable(false);
+                        selfLink.setText(String.format("Connection %s", node.getSelf()));
+                    }
                 }
             }
-        }
+        });
     }
 
     private void squashAction() {

@@ -3,6 +3,7 @@ package de.kjosu.neatdebug.components;
 import de.kjosu.jnstinct.core.ConnectionGene;
 import de.kjosu.jnstinct.core.Genome;
 import de.kjosu.jnstinct.core.NodeGene;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -106,36 +107,39 @@ public class ConnectionInspector extends GridPane {
     }
 
     public void update() {
-        boolean disable = connection == null;
+        Platform.runLater(() -> {
+            boolean disable = connection == null;
 
-        fromNodeLink.setDisable(disable);
-        toNodeLink.setDisable(disable);
-        gainField.setDisable(disable);
-        weightField.setDisable(disable);
-        enabledBox.setDisable(disable);
-        gaterLink.setDisable(true);
-        gaterLink.setText("undefined");
+            idField.setDisable(disable);
+            fromNodeLink.setDisable(disable);
+            toNodeLink.setDisable(disable);
+            gainField.setDisable(disable);
+            weightField.setDisable(disable);
+            enabledBox.setDisable(disable);
+            gaterLink.setDisable(true);
+            gaterLink.setText("undefined");
 
-        if (disable) {
-            idField.clear();
-            fromNodeLink.setText("undefined");
-            toNodeLink.setText("undefined");
-            gainField.clear();
-            weightField.clear();
-            enabledBox.setSelected(false);
-        } else {
-            idField.setText(String.valueOf(connection.getId()));
-            fromNodeLink.setText(String.format("Node %s", connection.getFromNode()));
-            toNodeLink.setText(String.format("Node %s", connection.getToNode()));
-            gainField.setText(String.valueOf(connection.getGain()));
-            weightField.setText(String.valueOf(connection.getWeight()));
-            enabledBox.setSelected(connection.isEnabled());
+            if (disable) {
+                idField.clear();
+                fromNodeLink.setText("undefined");
+                toNodeLink.setText("undefined");
+                gainField.clear();
+                weightField.clear();
+                enabledBox.setSelected(false);
+            } else {
+                idField.setText(String.valueOf(connection.getId()));
+                fromNodeLink.setText(String.format("Node %s", connection.getFromNode()));
+                toNodeLink.setText(String.format("Node %s", connection.getToNode()));
+                gainField.setText(String.valueOf(connection.getGain()));
+                weightField.setText(String.valueOf(connection.getWeight()));
+                enabledBox.setSelected(connection.isEnabled());
 
-            if (connection.getGaterNode() != -1 && genome != null) {
-                gaterLink.setDisable(false);
-                gaterLink.setText(String.format("Node %s", connection.getGaterNode()));
+                if (connection.getGaterNode() != -1 && genome != null) {
+                    gaterLink.setDisable(false);
+                    gaterLink.setText(String.format("Node %s", connection.getGaterNode()));
+                }
             }
-        }
+        });
     }
 
     private void fromNodeAction() {

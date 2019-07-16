@@ -3,17 +3,22 @@ package de.kjosu.neatdebug.components;
 import de.kjosu.jnstinct.core.ConnectionGene;
 import de.kjosu.jnstinct.core.Genome;
 import de.kjosu.jnstinct.core.NodeGene;
+import de.kjosu.jnstinct.util.MapUtils;
 import de.kjosu.neatdebug.util.Point;
 import javafx.geometry.VPos;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
 import java.awt.*;
 import java.awt.geom.QuadCurve2D;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GenomeVisualizer extends RenderCanvas {
@@ -29,6 +34,7 @@ public class GenomeVisualizer extends RenderCanvas {
     private ConnectionInspector connectionInspector;
 
     private Genome<?> genome;
+    private NodeGene selectedNode;
 
     public GenomeVisualizer() {
 
@@ -45,6 +51,10 @@ public class GenomeVisualizer extends RenderCanvas {
         }
 
         for (NodeGene node : genome.getNodes().values()) {
+            if (coordinates.containsKey(node)) {
+                continue;
+            }
+
             Point p = new Point();
 
             switch (node.getType()) {
@@ -101,6 +111,57 @@ public class GenomeVisualizer extends RenderCanvas {
         renderGates(g);
         renderConnections(g);
         renderNodes(g);
+    }
+
+    @Override
+    protected void onMouseDown(MouseEvent e) {
+        for (Map.Entry<NodeGene, Point> entry : coordinates.entrySet()) {
+            Point p = getScreenCoordinates(entry.getValue());
+
+            if (p.distance(e.getX(), e.getY()) > nodeRadius) {
+                continue;
+            }
+
+            selectedNode = entry.getKey();
+
+            if (nodeInspector != null && e.getClickCount() == 2) {
+                nodeInspector.set(genome, entry.getKey());
+            }
+
+            break;
+        }
+    }
+
+    @Override
+    protected void onMouseUp(MouseEvent e) {
+        selectedNode = null;
+    }
+
+    @Override
+    protected void onMouseMoved(MouseEvent e) {
+
+    }
+
+    @Override
+    protected void onMouseDragged(MouseEvent e) {
+        if (selectedNode == null) {
+            return;
+        }
+
+        Point p = coordinates.get(selectedNode);
+
+        p.x = e.getX() / getWidth();
+        p.y = e.getY() / getHeight();
+    }
+
+    @Override
+    protected void onKeyDown(KeyEvent e) {
+
+    }
+
+    @Override
+    protected void onKeyUp(KeyEvent e) {
+
     }
 
     private void renderNodes(GraphicsContext g) {
