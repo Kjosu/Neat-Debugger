@@ -249,7 +249,12 @@ public class SceneController<T extends Genome<T>> {
     public void setNeat(Neat<T> neat) {
         this.neat = neat;
 
+        genomeVisualizer.setGenome(null);
+
         updatePopulationList();
+
+        nodeInspector.update();
+        connectionInspector.update();
     }
 
     public void dispose() {
